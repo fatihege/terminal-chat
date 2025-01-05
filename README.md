@@ -93,7 +93,11 @@ The **CMakeLists.txt** file is configured to build two separate executables: one
 
 ## Future Improvements
 
-1. **Username support:** Allow clients to set usernames and display them with messages.
-2. **Configuration Options:** Make the server port configurable.
-3. **IP Ban/Kick:** Add the ability for the server to ban or kick clients based on their IP address.
-4. **Previous Connections List:** On the client, maintain a list of previously connected servers for quick reconnection.
+1. **IP Ban/Kick:** Add the ability for the server to ban or kick clients based on their IP address.
+2. **Previous Connections List:** On the client, maintain a list of previously connected servers for quick reconnection.
+3. **Additional commands:** Implement more commands to enhance user experience. Examples include:
+   - `/list`: Display a list of all connected clients.
+   - `/private [username] [message]`: Send a private message to a specific user.
+   - `/rename [new_username]`: Allow clients to change their username during the session.
+   - `/whoami`: Display the client’s username and current server connection info.
+   - `/help`: Provide a list of available commands with descriptions.
