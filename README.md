@@ -95,5 +95,4 @@ The **CMakeLists.txt** file is configured to build two separate executables: one
 
 1. **Previous Connections List:** On the client, maintain a list of previously connected servers for quick reconnection.
 2. **Additional commands:** Implement more commands to enhance user experience. Examples include:
-   - `/list`: Display a list of all connected clients.
    - `/private [username] [message]`: Send a private message to a specific user.

@@ -145,6 +145,14 @@ void ChatServer::processClientConnection(const SOCKET clientSocket) {
             continue;
         }
 
+        if (message == "/list") {
+            std::lock_guard lock(clientsMutex);
+            string userList = "Connected users:\n";
+            for (const auto &client: clients)
+                userList += client.getUsername() + " (" + std::to_string(client.getSocket()) + ")\n";
+            send(clientSocket, userList.c_str(), static_cast<int>(userList.size()), 0);
+            continue;
+        }
 
         string currentUsername = username; {
             std::lock_guard lock(clientsMutex);

@@ -76,10 +76,11 @@ void ChatClient::handleSending() {
 
     commands.addCommand("help", "Display available commands", [](const std::vector<string> &) {
         cout << '\n';
-        cout << "/help               - Display available commands\n";
-        cout << "/exit               - Disconnect from server\n";
+        cout << "/list               - List connected users\n";
         cout << "/whoami             - Display your current session information\n";
         cout << "/rename [username]  - Change your username\n";
+        cout << "/help               - Display available commands\n";
+        cout << "/exit               - Disconnect from server\n";
     });
 
     commands.addCommand("exit", "Disconnect from server", [this](const std::vector<string> &) {
@@ -141,6 +142,12 @@ void ChatClient::handleSending() {
             cout << "Username changed to " << newUsername << ".\n";
             username = newUsername;
         }
+    });
+
+    commands.addCommand("list", "List connected users", [this](const std::vector<string> &) {
+        const string listCommand = "/list";
+        if (send(clientSocket, listCommand.c_str(), static_cast<int>(listCommand.size()), 0) == SOCKET_ERROR)
+            cout << "Failed to send /list command. Error: " << WSAGetLastError() << '\n';
     });
 
     string message;
