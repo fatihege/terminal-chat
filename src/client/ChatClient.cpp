@@ -78,11 +78,12 @@ void ChatClient::handleSending() {
 
     commands.addCommand("help", "Display available commands", [](const std::vector<string> &) {
         cout << '\n';
-        cout << "/list               - List connected users\n";
-        cout << "/whoami             - Display your current session information\n";
-        cout << "/rename [username]  - Change your username\n";
-        cout << "/help               - Display available commands\n";
-        cout << "/exit               - Disconnect from server\n";
+        cout << "/list                        - List connected users\n";
+        cout << "/whoami                      - Display your current session information\n";
+        cout << "/rename [username]           - Change your username\n";
+        cout << "/private [socket] [message]  - Change your username\n";
+        cout << "/help                        - Display available commands\n";
+        cout << "/exit                        - Disconnect from server\n";
     });
 
     commands.addCommand("exit", "Disconnect from server", [this](const std::vector<string> &) {
@@ -158,7 +159,7 @@ void ChatClient::handleSending() {
             return;
         }
 
-        const std::string socketStr = args[0];
+        const std::string& socketStr = args[0];
 
         try {
             const unsigned long socketValue = std::stoul(socketStr);
