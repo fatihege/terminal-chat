@@ -69,7 +69,7 @@ cmake --build build
 - Messages will be broadcasted to all connected clients.
 
 ### Stopping the Server
-- Type 'exit' and press Enter in the server terminal to stop the server gracefully.
+- Type `exit` and press Enter in the server terminal to stop the server gracefully.
 
 ---
 

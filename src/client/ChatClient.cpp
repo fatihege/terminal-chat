@@ -78,15 +78,43 @@ void ChatClient::handleSending() const {
         cout << '\n';
         cout << "/help    - Display available commands\n";
         cout << "/exit    - Disconnect from server\n";
+        cout << "/whoami  - Display your current session information\n";
     });
 
     commands.addCommand("exit", "Disconnect from server", [this](const std::vector<string> &) {
         shutdown();
     });
 
+    commands.addCommand("whoami", "Display your current session information", [this](const std::vector<string> &) {
+        char hostname[256];
+        if (gethostname(hostname, sizeof(hostname)) == SOCKET_ERROR) {
+            cout << "Error retrieving hostname. Error: " << WSAGetLastError() << '\n';
+            return;
+        }
+
+        addrinfo hints{}, *info;
+        hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+
+        if (getaddrinfo(hostname, nullptr, &hints, &info) != 0) {
+            cout << "Error resolving hostname to IP address. Error: " << WSAGetLastError() << '\n';
+            return;
+        }
+
+        char ipStr[INET_ADDRSTRLEN];
+        const auto *ipv4 = reinterpret_cast<sockaddr_in *>(info->ai_addr);
+        inet_ntop(AF_INET, &ipv4->sin_addr, ipStr, INET_ADDRSTRLEN);
+
+        freeaddrinfo(info);
+
+        cout << "Username: " << username << '\n';
+        cout << "IP Address: " << ipStr << '\n';
+        cout << "Connected server: " << ip << ':' << port << '\n';
+    });
+
     string message;
     while (getline(cin, message)) {
-        if (message.rfind("/", 0) == 0) {
+        if (message.rfind('/', 0) == 0) {
             commands.executeCommand(message);
             cout << '\n';
         } else {
