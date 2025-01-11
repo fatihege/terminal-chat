@@ -21,6 +21,10 @@ public:
 
     [[nodiscard]] std::string getInfo() const;
 
+    [[nodiscard]] std::string getUsername() const;
+
+    void setUsername(const std::string &);
+
     [[nodiscard]] std::string getIp() const;
 
     void sendBanMessage() const;

@@ -6,7 +6,7 @@
 
 class ChatClient {
 public:
-    explicit ChatClient(const std::string &, const unsigned short &, const std::string &);
+    explicit ChatClient(std::string , const unsigned short &, std::string );
 
     ~ChatClient();
 
@@ -23,7 +23,7 @@ private:
 
     void setupConnection();
 
-    void handleSending() const;
+    void handleSending();
 
     void handleReceiving();
 

@@ -13,8 +13,8 @@ using std::cin;
 using std::string;
 using std::runtime_error;
 
-ChatClient::ChatClient(const string &ip, const unsigned short &port, const string &username): ip(ip), port(port),
-    username(username), clientSocket(0) {
+ChatClient::ChatClient(string ip, const unsigned short &port, string username): ip(std::move(ip)), port(port),
+    username(std::move(username)), clientSocket(0) {
 }
 
 ChatClient::~ChatClient() {
@@ -71,14 +71,15 @@ void ChatClient::setupConnection() {
     shutdown();
 }
 
-void ChatClient::handleSending() const {
+void ChatClient::handleSending() {
     Commands commands("/");
 
     commands.addCommand("help", "Display available commands", [](const std::vector<string> &) {
         cout << '\n';
-        cout << "/help    - Display available commands\n";
-        cout << "/exit    - Disconnect from server\n";
-        cout << "/whoami  - Display your current session information\n";
+        cout << "/help               - Display available commands\n";
+        cout << "/exit               - Disconnect from server\n";
+        cout << "/whoami             - Display your current session information\n";
+        cout << "/rename [username]  - Change your username\n";
     });
 
     commands.addCommand("exit", "Disconnect from server", [this](const std::vector<string> &) {
@@ -111,6 +112,35 @@ void ChatClient::handleSending() const {
         cout << "Username: " << username << '\n';
         cout << "IP Address: " << ipStr << '\n';
         cout << "Connected server: " << ip << ':' << port << '\n';
+    });
+
+    commands.addCommand("rename", "Change your username", [this](const std::vector<string> &args) {
+        if (args.empty()) {
+            cout << "Usage: /rename [username]\n";
+            return;
+        }
+
+        string newUsername = args[0];
+
+        for (const char c: newUsername) {
+            if (!isalnum(c)) {
+                cout << "Invalid username. Only alphanumeric characters are allowed.\n";
+                return;
+            }
+        }
+
+        if (newUsername.size() > 100) {
+            cout << "Invalid username. Must be 100 characters or fewer.\n";
+            return;
+        }
+
+        const string renameMessage = "/rename " + newUsername;
+        if (send(clientSocket, renameMessage.c_str(), static_cast<int>(renameMessage.size()), 0) == SOCKET_ERROR) {
+            cout << "Rename failed. Error: " << WSAGetLastError() << '\n';
+        } else {
+            cout << "Username changed to " << newUsername << ".\n";
+            username = newUsername;
+        }
     });
 
     string message;

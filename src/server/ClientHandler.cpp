@@ -37,6 +37,14 @@ std::string ClientHandler::getInfo() const {
     return ip + " " + username + " (" + std::to_string(socket) + ")";
 }
 
+std::string ClientHandler::getUsername() const {
+    return username;
+}
+
+void ClientHandler::setUsername(const std::string &newUsername) {
+    username = newUsername;
+}
+
 std::string ClientHandler::getIp() const {
     return ip;
 }

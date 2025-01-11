@@ -113,15 +113,60 @@ void ChatServer::processClientConnection(const SOCKET clientSocket) {
         bytesReceived = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
         if (bytesReceived <= 0) {
             std::lock_guard lock(clientsMutex);
-            cout << "Client disconnected: " << ip << " " << username << " (" << clientSocket << ")\n";
+            string currentUsername = username;
+            for (const auto &client: clients) {
+                if (client.getSocket() == clientSocket) {
+                    currentUsername = client.getUsername();
+                    break;
+                }
+            }
+            cout << "Client disconnected: " << ip << " " << currentUsername << " (" << clientSocket << ")\n";
             break;
         }
 
         buffer[bytesReceived] = '\0';
-        broadcastMessage(username + ": " + buffer, clientSocket);
+        string message(buffer);
+
+        if (message.rfind("/rename ", 0) == 0) {
+            string newUsername = message.substr(8);
+            string broadcastMsg; {
+                std::lock_guard lock(clientsMutex);
+                for (auto &client: clients) {
+                    if (client.getSocket() == clientSocket) {
+                        cout << "Client renamed: " << client.getInfo() << " -> " << newUsername << '\n';
+                        broadcastMsg = client.getUsername() + " has changed their name to " + newUsername;
+                        client.setUsername(newUsername);
+                        break;
+                    }
+                }
+            }
+
+            if (!broadcastMsg.empty()) broadcastMessage(broadcastMsg, clientSocket);
+            continue;
+        }
+
+
+        string currentUsername = username; {
+            std::lock_guard lock(clientsMutex);
+            for (const auto &client: clients) {
+                if (client.getSocket() == clientSocket) {
+                    currentUsername = client.getUsername();
+                    break;
+                }
+            }
+        }
+
+        broadcastMessage(currentUsername + ": " + message, clientSocket);
     } {
         std::lock_guard lock(clientsMutex);
-        removeClient(ClientHandler(clientSocket, username, ip));
+        string currentUsername = username;
+        for (const auto &client: clients) {
+            if (client.getSocket() == clientSocket) {
+                currentUsername = client.getUsername();
+                break;
+            }
+        }
+        removeClient(ClientHandler(clientSocket, currentUsername, ip));
     }
 }
 

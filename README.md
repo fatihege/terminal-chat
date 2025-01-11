@@ -97,6 +97,3 @@ The **CMakeLists.txt** file is configured to build two separate executables: one
 2. **Additional commands:** Implement more commands to enhance user experience. Examples include:
    - `/list`: Display a list of all connected clients.
    - `/private [username] [message]`: Send a private message to a specific user.
-   - `/rename [new_username]`: Allow clients to change their username during the session.
-   - `/whoami`: Display the client’s username and current server connection info.
-   - `/help`: Provide a list of available commands with descriptions.
