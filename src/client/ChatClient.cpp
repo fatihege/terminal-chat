@@ -83,6 +83,7 @@ void ChatClient::handleSending() const {
 
     commands.addCommand("exit", "Disconnect from server", [this](const std::vector<string> &) {
         shutdown();
+        exit(0);
     });
 
     commands.addCommand("whoami", "Display your current session information", [this](const std::vector<string> &) {
