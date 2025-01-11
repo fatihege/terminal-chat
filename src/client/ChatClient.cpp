@@ -1,7 +1,9 @@
+#define NOMINMAX
 #include <iostream>
 #include <utility>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <algorithm>
 
 #include "ChatClient.h"
 #include "../common/Commands.h"
@@ -148,6 +150,33 @@ void ChatClient::handleSending() {
         const string listCommand = "/list";
         if (send(clientSocket, listCommand.c_str(), static_cast<int>(listCommand.size()), 0) == SOCKET_ERROR)
             cout << "Failed to send /list command. Error: " << WSAGetLastError() << '\n';
+    });
+
+    commands.addCommand("private", "Send a private message to a specific user by socket", [this](const std::vector<std::string> &args) {
+        if (args.size() < 2) {
+            cout << "Usage: /private [socket] [message]\n";
+            return;
+        }
+
+        const std::string socketStr = args[0];
+
+        try {
+            const unsigned long socketValue = std::stoul(socketStr);
+            if (socketValue > std::numeric_limits<SOCKET>::max()) throw std::out_of_range("Socket value out of range.");
+            static_cast<SOCKET>(socketValue);
+
+            std::string privateMessage = args[1];
+            for (size_t i = 2; i < args.size(); ++i) privateMessage += " " + args[i];
+
+            const std::string command = "/private " + socketStr + " " + privateMessage;
+            if (send(clientSocket, command.c_str(), static_cast<int>(command.size()), 0) == SOCKET_ERROR)
+                cout << "Failed to send private message. Error: " << WSAGetLastError() << '\n';
+            else cout << "[To Socket " << socketStr << "] " << privateMessage << '\n';
+        } catch (const std::invalid_argument &) {
+            cout << "Invalid socket. Socket must be a numeric value.\n";
+        } catch (const std::out_of_range &) {
+            cout << "Invalid socket. Socket value is out of range.\n";
+        }
     });
 
     string message;

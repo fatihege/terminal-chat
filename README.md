@@ -88,11 +88,3 @@ The **CMakeLists.txt** file is configured to build two separate executables: one
     target_link_libraries(terminal_chat_server ws2_32)
     target_link_libraries(terminal_chat_client ws2_32)
     ```
-
----
-
-## Future Improvements
-
-1. **Previous Connections List:** On the client, maintain a list of previously connected servers for quick reconnection.
-2. **Additional commands:** Implement more commands to enhance user experience. Examples include:
-   - `/private [username] [message]`: Send a private message to a specific user.

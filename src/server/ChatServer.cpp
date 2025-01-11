@@ -154,6 +154,42 @@ void ChatServer::processClientConnection(const SOCKET clientSocket) {
             continue;
         }
 
+        if (message.rfind("/private ", 0) == 0) {
+            size_t firstSpace = message.find(' ', 9);
+            if (firstSpace == std::string::npos) {
+                send(clientSocket, "Usage: /private [socket] [message]\n", 36, 0);
+                continue;
+            }
+
+            std::string socketStr = message.substr(9, firstSpace - 9);
+            std::string privateMessage = message.substr(firstSpace + 1);
+
+            SOCKET targetSocket = static_cast<SOCKET>(std::stoi(socketStr));
+
+            bool messageSent = false; {
+                std::lock_guard lock(clientsMutex);
+                for (const auto &client: clients) {
+                    if (client.getSocket() == targetSocket) {
+                        std::string senderUsername;
+                        for (const auto &sender: clients) {
+                            if (sender.getSocket() == clientSocket) {
+                                senderUsername = sender.getUsername();
+                                break;
+                            }
+                        }
+                        std::string formattedMessage = "[Private from " + senderUsername + "] " + privateMessage;
+                        if (send(targetSocket, formattedMessage.c_str(), static_cast<int>(formattedMessage.size()),
+                                 0) != SOCKET_ERROR)
+                            messageSent = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!messageSent) send(clientSocket, "Error: Target socket not found or message delivery failed.\n", 55, 0);
+            continue;
+        }
+
         string currentUsername = username; {
             std::lock_guard lock(clientsMutex);
             for (const auto &client: clients) {
